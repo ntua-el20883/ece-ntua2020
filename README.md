@@ -20,12 +20,12 @@ int main(){
 ```
 
 # Drives
-OneDrive για το 1ο και το 2ο Εξάμηνο, από τον Θανάση Σπηλιώτη:
--1ο Εξάμηνο: https://ntuagr-my.sharepoint.com/:f:/g/personal/el20175_ntua_gr/Et3zHsZ1T3pCidiVwoLAhW4ByfkD19Gs_FUDbFFfN8hOaw
+OneDrive για το 1ο και το 2ο Εξάμηνο, από τον Θανάση Σπηλιώτη:<br /> 
+-1ο Εξάμηνο: https://ntuagr-my.sharepoint.com/:f:/g/personal/el20175_ntua_gr/Et3zHsZ1T3pCidiVwoLAhW4ByfkD19Gs_FUDbFFfN8hOaw<br /> 
 -2ο Εξάμηνο: https://ntuagr-my.sharepoint.com/:f:/g/personal/el20175_ntua_gr/EtiYkRX-QHJBsnmTbYiltLgBKZptOyrrfJH4sb61D9okOg?e=wbkndU
 
 # Φόρουμ
-Το φόρουμ της Σχολής, όπου θα βρείτε πολύ παραπάνω υλικό (σημειώσεις, παλαιά θέματα κτλπ):
+Το φόρουμ της Σχολής, όπου θα βρείτε πολύ παραπάνω υλικό (σημειώσεις, παλαιά θέματα κτλπ):<br /> 
 https://shmmy.ntua.gr/forum/
 
 # Star

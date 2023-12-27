@@ -1,0 +1,306 @@
+// PZhelp: An educational helper include file for -*- C++ -*-
+// URL: https://github.com/softlab-ntua/pzhelp
+
+#ifndef __PZHELP__
+#define __PZHELP__
+
+
+// Standard header files
+
+#include <cstdarg>
+#include <cstddef>
+#include <cstdio>
+#include <cstdlib>
+#include <cstring>
+#include <cfloat>
+#include <climits>
+#include <cmath>
+
+
+// Expose the standard namespace
+
+using namespace std;
+
+
+// Type for REAL numbers
+
+typedef double REAL;
+
+#define REAL_MANT_DIG   DBL_MANT_DIG
+#define REAL_DIG        DBL_DIG
+#define REAL_MIN_EXP    DBL_MIN_EXP
+#define REAL_MIN_10_EXP DBL_MIN_10_EXP
+#define REAL_MAX_EXP    DBL_MAX_EXP
+#define REAL_MAX_10_EXP DBL_MAX_10_EXP
+#define REAL_MIN        DBL_MIN
+#define REAL_MAX        DBL_MAX
+#define REAL_EPSILON    DBL_EPSILON
+
+
+// Runtime errors and messages
+
+#define __pzhelp_ERROR(...)                             \
+  __pzhelp_runtime(__pzhelp_error_normal, __VA_ARGS__)
+#define __pzhelp_FATAL(...)                             \
+  __pzhelp_runtime(__pzhelp_error_fatal, __VA_ARGS__)
+#define __pzhelp_SYSTEM(...)                            \
+  __pzhelp_runtime(__pzhelp_error_system, __VA_ARGS__)
+
+enum __pzhelp_error_type {
+  __pzhelp_error_normal,
+  __pzhelp_error_fatal,
+  __pzhelp_error_system
+};
+
+inline void __pzhelp_runtime (__pzhelp_error_type t, const char * fmt, ...) {
+  va_list arg;
+  va_start(arg, fmt);
+  if (t == __pzhelp_error_system) perror(NULL);
+  fprintf(stderr, "PZhelp runtime error: ");
+  vfprintf(stderr, fmt, arg);
+  fprintf(stderr, "\n");
+  if (t == __pzhelp_error_fatal) exit(1);
+}
+
+
+// Generic argument counting machinery
+
+#define __pzhelp_CAT(A, B) __pzhelp_CAT2(A, B)
+#define __pzhelp_CAT2(A, B) A ## B
+
+#define __pzhelp_COUNT_ARG(...) \
+  __pzhelp_COUNT_AUX(42, ## __VA_ARGS__, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0)
+#define __pzhelp_COUNT_AUX(_, _1, _2, _3, _4, _5, _6, _7, _8, _9, _10, n, ...) n
+
+
+// WRITE set of macros
+
+#define WRITE __pzhelp_write
+#define WRITELN __pzhelp_write_ln
+
+inline void __pzhelp_write_fmt (const char * a, int w, int) {
+  printf("%*s", w, a);
+}
+
+inline void __pzhelp_write_fmt (bool a, int w, int) {
+  printf("%*s", w, a ? "true" : "false");
+}
+
+inline void __pzhelp_write_fmt (char a, int w, int) {
+  printf("%*c", w, a);
+}
+
+inline void __pzhelp_write_fmt (int a, int w, int) {
+  printf("%*d", w, a);
+}
+
+inline void __pzhelp_write_fmt (unsigned int a, int w, int) {
+  printf("%*u", w, a);
+}
+
+inline void __pzhelp_write_fmt (long int a, int w, int) {
+  printf("%*ld", w, a);
+}
+
+inline void __pzhelp_write_fmt (unsigned long a, int w, int) {
+  printf("%*lu", w, a);
+}
+
+inline void __pzhelp_write_fmt (long long int a, int w, int) {
+  printf("%*lld", w, a);
+}
+
+inline void __pzhelp_write_fmt (unsigned long long a, int w, int) {
+  printf("%*llu", w, a);
+}
+
+inline void __pzhelp_write_fmt (float a, int w, int p) {
+  printf("%*.*f", w, p, a);
+}
+
+inline void __pzhelp_write_fmt (double a, int w, int p) {
+  printf("%*.*lf", w, p, a);
+}
+
+inline void __pzhelp_write_fmt (long double a, int w, int p) {
+  printf("%*.*Lf", w, p, a);
+}
+
+template<typename T>
+inline void __pzhelp_write_sep (T const& a) {
+  putchar(' ');
+  __pzhelp_write_fmt(a, 0, 6);
+}
+
+template<typename TF, typename ... TR>
+inline void __pzhelp_write_sep (TF const& first, TR const& ... rest) {
+  __pzhelp_write_sep(first);
+  __pzhelp_write_sep(rest...);
+}
+
+inline void __pzhelp_write () {}
+
+template<typename T>
+inline void __pzhelp_write (T const& a) {
+  __pzhelp_write_fmt(a, 0, 6);
+}
+
+template<typename TF, typename ... TR>
+inline void __pzhelp_write (TF const& first, TR const& ... rest) {
+  __pzhelp_write_fmt(first, 0, 6);
+  __pzhelp_write_sep(rest...);
+}
+
+template<typename ... TR>
+inline void __pzhelp_write_ln (TR const& ... args) {
+  __pzhelp_write(args...);
+  putchar('\n');
+}
+
+template<typename T>
+class __pzhelp_format {
+ protected:
+  T const& value;
+  int width, precision;
+
+ public:
+  explicit __pzhelp_format (T const& a, int w, int p) :
+    value(a), width(w), precision(p) {}
+
+  template<typename TX>
+  friend inline void __pzhelp_write_fmt (__pzhelp_format<TX> const& a,
+                                         int w, int p);
+};
+
+template<typename T>
+inline __pzhelp_format<T> FORM (T const& a, int w) {
+  return __pzhelp_format<T>(a, w, 0);
+}
+
+template<typename T>
+inline __pzhelp_format<T> FORM (T const& a, int w, int p) {
+  return __pzhelp_format<T>(a, w, p);
+}
+
+template<typename T>
+inline void __pzhelp_write_fmt (__pzhelp_format<T> const& a, int, int) {
+  __pzhelp_write_fmt(a.value, a.width, a.precision);
+}
+
+
+// READ set of functions
+
+inline int READ_INT () {
+  int result;
+  if (scanf("%d", &result) != 1)
+    __pzhelp_FATAL("cannot read an integer number");
+  return result;
+}
+
+inline REAL READ_REAL () {
+  REAL result;
+  if (scanf("%lf", &result) != 1)
+    __pzhelp_FATAL("cannot read a real number");
+  return result;
+}
+
+inline char* READ_STRING (size_t n, char *s) {
+  char *result = s;
+  for (size_t i = 0; i < n; i++) {
+    int c = (i+1 < n) ? getchar() : '\0';
+    if (c == '\n' || c == EOF) { *s++ = '\0'; break; }
+    *s++ = c;
+  }
+  return result;
+}
+
+inline void SKIP_LINE () {
+  for (;;) {
+    int c = getchar();
+    if (c == '\n' || c == EOF) break;
+  }
+}
+
+
+// Program and procedures
+
+#define PROGRAM int main ()
+#define PROC void
+#define FUNC
+
+
+// FOR loops
+
+#define __pzhelp_FOR_4(var, start, sign, stop)  \
+  __pzhelp_FOR_5(var, start, sign, stop, 1)
+#define __pzhelp_FOR_5(var, start, sign, stop, step)                    \
+  for (decltype(((stop) - (start)) / (step))                            \
+         __the_var  = (start),                                          \
+         __the_stop = (stop),                                           \
+         __the_step = (sign) * ((step) ? :                              \
+           (__pzhelp_FATAL("zero step in FOR loop"), 1));               \
+       ((var) = __the_var,                                              \
+        (__the_step >= 0 ? __the_var <= __the_stop                      \
+         : __the_var >= __the_stop));                                   \
+       ((var) != __the_var ?                                            \
+          __pzhelp_FATAL("control variable changed in FOR loop") :      \
+        (stop) != __the_stop ?                                          \
+          __pzhelp_FATAL("loop limit changed in FOR loop") :            \
+        (__the_var += __the_step, (void) 0)))
+
+#define FOR(...) \
+  __pzhelp_CAT(__pzhelp_FOR_, __pzhelp_COUNT_ARG(__VA_ARGS__))(__VA_ARGS__)
+
+#define TO     , +1 ,
+#define DOWNTO , -1 ,
+#define STEP   ,
+
+
+// Aliases for operators
+
+#define MOD %
+#define AND &&
+#define OR  ||
+#define NOT !
+
+
+// MIN and MAX
+
+template<typename T>
+const T& min (const T& a, const T& b) {
+  return (b < a) ? b : a;
+}
+
+template<typename T>
+const T& max (const T& a, const T& b) {
+  return (a < b) ? b : a;
+}
+
+
+// I/O redirection
+
+inline void INPUT (const char *filename) {
+  if (freopen(filename, "rt", stdin) == NULL) {
+    __pzhelp_SYSTEM("Cannot redirect stdin to %s", filename);
+    perror(NULL);
+  }
+}
+
+inline void OUTPUT (const char *filename) {
+  if (freopen(filename, "wt", stdout) == NULL)
+    __pzhelp_SYSTEM("Cannot redirect stdout to %s", filename);
+}
+
+
+// Dynamic memory management
+
+#define __pzhelp_NEW_1(type)    __pzhelp_NEW_2(type, 1)
+#define __pzhelp_NEW_2(type, n) (new type [n])
+
+#define NEW(...) \
+  __pzhelp_CAT(__pzhelp_NEW_, __pzhelp_COUNT_ARG(__VA_ARGS__))(__VA_ARGS__)
+
+#define DELETE(p) do { delete [] (p); } while(0)
+
+
+#endif  // __PZHELP__

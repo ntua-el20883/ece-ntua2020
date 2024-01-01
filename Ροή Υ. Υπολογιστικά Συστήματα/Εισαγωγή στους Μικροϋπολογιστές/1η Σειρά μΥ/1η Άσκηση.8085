@@ -1,0 +1,15 @@
+PROG:
+	MVI C,08H	; Move immediate the value 08H to C
+	LDA 2000H	; Load the contents of mem_loc 2000H into A
+NEXT1:
+	RAL		; Rotate left A’s contents
+	JC NEXT2	; If(CY==1) then (jump to mem_loc 080DH)
+	DCR C		; Decrement C’s contents by 1
+	JNZ NEXT1	; If(Z==0) then (jump to mem_loc 0805H)
+NEXT2:
+	MOV A,C	; Move C’s contents to A
+	CMA		; Complement A
+	STA 3000H	; Store A’s contents to mem_loc 3000H
+	RST 1		; Restart 1
+	JMP PROG
+END

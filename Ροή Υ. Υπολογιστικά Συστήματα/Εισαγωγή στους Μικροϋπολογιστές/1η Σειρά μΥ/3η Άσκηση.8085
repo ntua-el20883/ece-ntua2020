@@ -1,0 +1,47 @@
+	LXI B,01F4H	; Load immediate the values B=01H, C=F4H (01F4Hex = 500Dec)
+PROG:	
+	LDA 2000H	; Load the value of mem_loc 2000H (i.e., input) to A
+	CPI C8H	; (C8Hex = 200Dec)
+			; If(A?200) then (C=0)
+			; Else if (A<200) then (C=1)
+	JNC MSB_ERR	; If(C==0 ? A?200) then (jump MSB_ERR) 
+			; Else (we’ll check the next boundary)
+	CPI 64H	; (64Hex = 100Dec)
+			; If(A?100) then (C=0)
+			; Else if (A<100) then (C=1)
+	JNC LSB_ERR	; If(C==0 ? A?100) then (jump LSB_ERR) 
+	MVI D,FFH	; (FFHex = 25510 = 1111 1111Bin)
+MAIN:	
+	INR D		; Increase D’s contents by 1
+	SUI 0AH	; Decrease A’s contents by 10 (0AHex = 10Bin)
+			; If(Result>A) then (C=1)
+	JNC MAIN	
+	ADI 0AH	; Increase A’s contents by 10 (0AHex = 10Bin).
+			; If(Result>A) then (C=1)
+	MOV E,A	; Copy A’s contents to E
+	MOV A,D	; Copy D’s contents to A
+	RLC		; Rotate left A’s contents 4 times, so MSD = MSB
+	RLC	
+	RLC	
+	RLC	
+	ADD E		; Add E’s contents to A, so LSD = LSBs
+	CMA		; Complement A’s contents (exit is reverse logic)
+	STA 3000H	; Store A’s contents to mem_loc 3000H (i.e., output)
+	JMP PROG	
+MSB_ERR:	
+	MVI A,0FH	; Move immediate the value A=0FH (0FHex = 0000 1111Bin) ? MSBs ON, LSBs OFF
+	STA 3000H	; Store A’s contents to mem_loc 3000H (i.e., output)
+	CALL DELB	; Wait for 0.5secs
+	MVI A,FFH	; Move immediate the value A=0FH (0FHex = 0000 1111Bin) ? MSBs ON, LSBs OFF
+	STA 3000H	; Store A’s contents to mem_loc 3000H (i.e., output)
+	CALL DELB	; Wait for 0.5secs
+	JMP PROG	
+LSB_ERR:	
+	MVI A,F0H	; Move immediate the value A=F0H (0FHex = 1111 0000Bin) ? MSBs OFF, LSBs ON
+	STA 3000H	; Store A’s contents to mem_loc 3000H (i.e., output)
+	CALL DELB	; Wait for 0.5secs
+	MVI A,FFH	; Move immediate the value A=FFH (FFHex = 1111 1111Bin) ? MSBs OFF, LSBs OFF
+	STA 3000H	; Store A’s contents to mem_loc 3000H (i.e., output)
+	CALL DELB	; sWait for 0.5secs
+	JMP PROG	
+END	

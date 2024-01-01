@@ -1,0 +1,60 @@
+; ================== Exercise (5) ==================
+; ================== Question (b) ==================
+	LXI H,00H	; Load immediate 16-bit data into register pair H (accumulator
+			; data)
+	MVI C,64d	; Move immediate data 64 decimal into register C (data counter)
+
+MAIN:
+	IN 20H		; Input from port 20H (wait until x7=1)
+	ANI 80H	; Logical AND immediate with 80H (10000000b)
+	JP MAIN	; Jump to MAIN if parity flag is set (x7=1)
+	
+	MOV A,C	; Move the data counter value to the accumulator
+	ANI 00000001b	; Logical AND immediate with 00000001b (LSB)
+	JPO 4MSB	; Jump to 4MSB if parity flag is odd (LSB is odd)
+	
+	IN 20H		; Input from port 20H (enter the 4 LSBs)
+	ANI 00001111b	; Logical AND immediate with 00001111b (LSB)
+	MOV B,A	; Move the value in accumulator A to register B (temporarily 
+			; store until MSB is obtained)
+	JMP 4LSB	; Jump to 4LSB (return until MSB is obtained)
+
+4MSB:
+	IN 20H		; Input from port 20H (enter the 4 MSBs)
+	ANI 00001111b	; Logical AND immediate with 00001111b (MSB)
+	RLC		; Rotate accumulator left through carry (4 times)
+	RLC
+	RLC
+	RLC
+	ORA B		; Logical OR with the value in register B (union with the LSBs)
+	MVI D,00H	; Move immediate data 00H into register D
+	MOV E,A		; Move the value in accumulator A to register E
+	DAD D		; Add the data
+
+4LSB:
+	DCR C		; Decrement the value in register C (data counter)
+	JZ ADDR	; Jump to ADDR if zero flag is set (data counter is zero)
+
+CHECK:			; Wait until x7=0
+	IN 20H		; Input from port 20H
+	ANI 80H	; Logical AND immediate with 80H (10000000b)
+	JM CHECK	; Jump to CHECK if sign flag is set (x7=1)
+
+	JMP MAIN	; Jump to MAIN
+
+ADDR:
+	DAD H		; Add the value in register pair H to HL
+	DAD H
+	DAD H
+	MOV A,L	; Move the value in register L to accumulator A
+	ANI 80H	; Logical AND immediate with 80H (10000000b)
+	MVI L,00H	; Move immediate data 00H into register L (to get 8-bit precision)
+	CPI 00H	; Compare immediate with 00H
+	JNZ ROUNDING	; Jump to ROUNDING if the result is not zero
+
+BACK:
+	HLT		; Halt
+
+ROUNDING:		; Rounding up
+	INR H		; Increment register H
+	JMP BACK	; Jump to BACK

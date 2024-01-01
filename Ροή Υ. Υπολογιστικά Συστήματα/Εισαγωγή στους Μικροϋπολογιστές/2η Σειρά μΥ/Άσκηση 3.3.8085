@@ -1,0 +1,144 @@
+START:	
+	IN 10H     ; memory protection removed
+	LXI H,0A00H ; 0A00H = the start of the storage block
+	MVI B,04H   ; simple repeater
+L1:	
+	MVI M,10H   ; store "empty" (4 times)
+	INX H
+	DCR B
+	JNZ L1
+LINE0:	
+	MVI A,FEH   ; scan door = 11111110 - line selection
+	STA 2800H	
+	LDA 1800H   ; read the key columns 
+	ANI 07H     ; keep only the 3 LSB (contain the information)	
+	MVI C,86H   ; C = possible code
+	CPI 06H     ; A ?= 00000110 (i.e. the button of
+		     ; 1st column [INSTR_STEP])
+	JZ SHOW     ; if yes, forward the code of the
+		     ; to the output of the 7-segment display
+	MVI C,85H   ; similarly for all possible buttons 
+	CPI 05H     ; A ?= 00000101 (i.e. the button of
+		     ; 2nd column [FETCH PC])
+	JZ SHOW	 	
+		     ; ignore the HDWR_STEP button
+LINE1:	
+	MVI A,FDH
+	STA 2800H	
+	LDA 1800H	 
+	ANI 07H		
+	MVI C,84H	
+	CPI 06H     ; RUN	
+	JZ SHOW	
+	MVI C,80H	
+	CPI 05H     ; FETCH_REG
+	JZ SHOW	 
+	MVI C,82H	 
+	CPI 03H     ; FETCH_ADDRS
+	JZ SHOW
+LINE2:	
+	MVI A,FBH
+	STA 2800H	
+	LDA 1800H	 
+	ANI 07H		
+	MVI C,00H	
+	CPI 06H     ; 0
+	JZ SHOW	
+	MVI C,83H	
+	CPI 05H     ; STORE/INCR
+	JZ SHOW	 
+	MVI C,81H	 
+	CPI 03H     ; DECR
+	JZ SHOW
+LINE3:	
+	MVI A,F7H
+	STA 2800H	
+	LDA 1800H	 
+	ANI 07H		
+	MVI C,01H   ; 1
+	CPI 06H	
+	JZ SHOW	
+	MVI C,02H   ; 2
+	CPI 05H	
+	JZ SHOW	 
+	MVI C,03H   ; 3
+	CPI 03H	
+	JZ SHOW
+LINE4:	
+	MVI A,EFH
+	STA 2800H	
+	LDA 1800H	 
+	ANI 07H		
+	MVI C,04H
+	CPI 06H     ; 4
+	JZ SHOW
+	MVI C,05H
+	CPI 05H     ; 5
+	JZ SHOW
+	MVI C,06H
+	CPI 03H     ; 6
+	JZ SHOW
+LINE5:	
+	MVI A,DFH
+	STA 2800H	
+	LDA 1800H	 
+	ANI 07H		
+	MVI C,07H
+	CPI 06H     ; 7
+	JZ SHOW
+	MVI C,08H
+	CPI 05H     ; 8
+	JZ SHOW
+	MVI C,09H
+	CPI 03H     ; 9
+	JZ SHOW
+LINE6:	
+	MVI A,BFH
+	STA 2800H	
+	LDA 1800H	 
+	ANI 07H		
+	MVI C,0AH
+	CPI 06H     ; A
+	JZ SHOW
+	MVI C,0BH
+	CPI 05H     ; B
+	JZ SHOW
+	MVI C,0CH
+	CPI 03H     ; C
+	JZ SHOW
+LINE7:	
+	MVI A,7FH
+	STA 2800H	
+	LDA 1800H	 
+	ANI 07H		
+	MVI C,0DH
+	CPI 06H     ; D
+	JZ SHOW
+	MVI C,0EH
+	CPI 05H     ; E
+	JZ SHOW
+	MVI C,0FH
+	CPI 03H     ; F
+	JZ SHOW
+	JMP START   ; if no button is pressed, repeat the checks
+
+SHOW:	
+	LXI H,0A04H ; prepare position 0A04H
+	MOV A,C     ; code --> A
+	ANI 0FH     ; keep the 4 LSBs 
+	MOV M,A     ; put them in position 0A04H
+	INX H       ; next memory location
+	MOV A,C		
+	ANI F0H     ; keep the 4 MSBs
+	RLC
+	RLC         ; make them LSBs
+	RLC
+	RLC	
+	MOV M,A     ; we store them in the sixth digit
+	LXI D,0A00H ; move block 0A00H - 0A05H
+                   ; to the point where the DCD reads
+	CALL STDM	
+	CALL DCD    ; display
+	JMP START   ; repeat
+
+	END

@@ -1,0 +1,27 @@
+START:
+       CALL KIND
+       CPI 00H	; If we press 0 then go to OFF
+       JZ OFF
+       CPI 09H	; If we press 9 then go to OFF
+       JNC OFF
+       MOV B,A	; Save A to register B
+       MVI A,00H	; A = 0
+       DCR B		; Decrease A
+       JZ TURN_ON	; If B = 0 then turn on all LEDs (We pressed 1)
+    
+REPEAT:
+       RLC		; Rotate left
+       INR A   	; Increase A
+       DCR B
+       JNZ REPEAT	; If B is not zero, repeat
+    
+TURN_ON:
+       STA 3000H	; Turn on the LEDs starting from the number that we pressed
+            		; up to the MSB
+       JMP START	; Start checking again
+    
+OFF:			; If we pressed 0 or 9 then turn off all LEDs and go to START
+       MVI A,FFH
+       STA 3000H
+       JMP START
+       END

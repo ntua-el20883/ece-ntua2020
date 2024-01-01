@@ -1,0 +1,69 @@
+; ================== Exercise (1) ==================
+	IN 10H		; Input from port 10H
+	MVI A,10H  	; Set up Display
+	STA 0B00H	; Store A in memory location 0B00H (2816)
+	STA 0B01H	; Store A in memory location 0B01H
+	STA 0B02H	; Store A in memory location 0B02H
+	STA 0B03H	; Store A in memory location 0B03H
+	STA 0B04H	; Store A in memory location 0B04H
+	STA 0B05H	; Store A in memory location 0B05H
+	MVI A,0DH	; Initialization of Interrupt mask
+	SIM		; Set interrupt mask
+	EI		; Enable interrupts
+MAIN:
+	JMP MAIN	; Loop indefinitely until the first "interupt" is pressed	
+INTR_ROUTINE:
+	POP H		; POP return address so that the stack doesn't fill up
+	EI		; Enable interrupts inside interrupt routine
+	MVI A,00H	; Turn on LEDs
+	STA 3000H	; Store A in memory location 3000H
+	MVI H,06H	; Counter for 6 iterations
+	MOV A,H
+	DCR A		; Set up tens
+	STA 0B01H	; Store A in memory location 0B01H (4th segment display)
+SECONDS:
+	MVI A,09H	; Set up 9 secs (units)
+LIGHTS_ON:
+	STA 0B00H	; Store A in memory location 0B00H (3rd segment display)
+	CALL DISPLAY	; Call subroutine DISPLAY	
+	DCR A
+	CPI 00H	; Compare with zero 
+	JNZ LIGHTS_ON	; If Z=0, then 9 seconds passed
+	CALL ZERO	; Display zero unit (1 sec)
+	DCR H		; Decrease counter
+	JZ EXIT	; If Z=0, end timer
+	MOV A,H
+	DCR A
+	STA 0B01H	; Store A in memory location 0B01H
+	JMP SECONDS	; Repeat for 60 seconds
+EXIT:
+	MVI A,FFH 	; Turn off LEDs
+	STA 3000H
+	JMP MAIN	; Return to main
+DISPLAY: 	
+	LXI B,0064H	; 100 msec delay
+	LXI D,0B00H	; For STDM
+	PUSH PSW	; Push registers onto the stack
+	PUSH H
+	PUSH D
+	PUSH B
+	CALL STDM	; Call subroutine STDM
+	MVI A,64H	; 100 * 100msec = 1 sec
+ONE_SEC:
+	CALL DCD	; Call subroutine DCD
+	CALL DELB	; Call subroutine DELB
+	DCR A
+	CPI 00H
+	JNZ ONE_SEC
+	POP B		; Pop registers from the stack
+	POP D
+	POP H
+	POP PSW
+	RET		; Return from subroutine
+ZERO:			; Display zero in the 3rd segment display
+	MVI A,00H
+	STA 0B00H
+	CALL DISPLAY	; Call subroutine DISPLAY
+	CALL DELB	; Call subroutine DELB
+	RET
+END

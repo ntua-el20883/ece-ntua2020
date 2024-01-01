@@ -1,0 +1,28 @@
+START:
+		MVI D,08H	;D = 8
+		LDA 2000H	;Load input from dip switches to A
+		MVI B,00H	;B = 0
+CHECK:				;Starting from LSB to MSB we find the first
+				;dip switch that's on
+		RRC
+		DCR D		;Decrease D
+		JZ TURNOFF	;If D = 0 then no dip switch was on so turn off
+				;all LEDs and start again
+		INR B		;Increase B (B is equal to the current position that
+				;we're checking)
+		JNC CHECK	;If a dip switch is on then stop looping
+		MVI A,FEH	
+		DCR B
+TURNON:
+		RLC		;Rotate left until we reach the correct position
+		DCR B
+		JNZ TURNON
+		STA 3000H	;Turn on the LED
+		JMP START	;Start checking again
+TURNOFF:			;Getting here means that no dip switch was on
+		MVI A,FFH
+		STA 3000H	;Turn off all LEDs
+		JMP START
+
+		END	
+		

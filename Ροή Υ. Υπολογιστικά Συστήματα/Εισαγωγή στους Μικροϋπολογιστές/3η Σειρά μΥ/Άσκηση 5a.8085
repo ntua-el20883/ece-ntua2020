@@ -1,0 +1,51 @@
+	MVI A,00H	; Initialize register A with 4-switches mask
+	SIM		; Set the interrupt mask
+	LXI H,00H	; Initialize HL register pair as accumulator data
+	MVI C,64d	; Initialize counter C with decimal value 64
+	EI		; Enable interrupts (enable switches)
+ADDR:			; Wait for data input
+	MVI A,C	; Move the value of counter C to A for comparison
+	CPI 00H	; Compare A with 00H
+	JNZ ADDR	; Jump to ADDR if A is not zero (check for complete input)
+	DI		; Disable interrupts (switch off switches)
+	DAD H		; Perform HL left rotation 3 times
+	DAD H
+	DAD H
+	MOV A,L	; Move the contents of L to A
+	ANI 80H	; Perform bitwise AND with 80H
+	MVI L,00H	; Set L to 00H for 8-bit precision
+	CPI 00H	; Compare A with 00H
+	JNZ ROUNDING	; Jump to ROUNDING if A is not zero (L's MSB = 1)
+BACK:			; Infinite loop until interrupted
+	HLT		; Halt the processor
+ROUNDING:		; Round up
+	INR H		; Increment the value of H
+	JMP BACK	; Jump to BACK (infinite loop)
+0034:			; Address label (assuming it represents a memory address)
+	JMP RST6.5	; Jump to RST6.5
+RST6.5:		; Subroutine for RST6.5
+	PUSH PSW	; Push the program status word onto the stack
+	MOV A,C	; Move the value of counter C to A
+	ANI 00000001b	; Perform bitwise AND with 00000001 binary (LSB)
+	JPO 4MSB	; Jump to 4MSB if parity is odd (checking if we got the LSBs or 
+			; MSBs)
+	IN 20H		; Input the data's 4 LSBs
+	ANI 00001111b	; Perform bitwise AND with 00001111 binary (door's 4 LSBs)
+	MOV B,A	; Temporarily store the result in register B
+	JMP 4LSB	; Jump to 4LSB (return to main until we get the data's MSBs)
+4MSB:			; Branch if we got the MSBs
+	IN 20H		; Input the data's 4 MSBs
+	ANI 00001111b	; Perform bitwise AND with 00001111 binary
+	RLC		; Rotate left 4 times to move the data to the MSB
+	RLC
+	RLC
+	RLC
+	ORA B		; Perform logical OR with the data's LSB
+	MVI D,00H	; Initialize D register to 00H
+	MOV E,A	; Move the result to E register
+	DAD D		; Add the data
+4LSB:			; Subroutine for 4LSB
+	PSW		; Restore the program status word from the stack
+	DCR C		; Decrement the value of counter C
+	EI		; Enable interrupts
+	RET		; Return from the subroutine

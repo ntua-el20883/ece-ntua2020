@@ -1,0 +1,58 @@
+START:
+	LDA 2000H     ; Load input from dip switches to accumulator
+	MOV B,A      ; Save A to register B
+
+	; XOR0 gate
+	ANI 01H      ; Mask to extract input bit A0
+	MOV C,A      ; Save A0 to register C
+	MOV A,B      ; Restore input to accumulator
+	ANI 02H      ; Mask to extract input bit B0
+	RRC          ; Rotate accumulator right to get LSB
+	XRA C        ; XOR A0 with LSB
+	MOV D,A      ; Save the result
+
+	; XOR1 gate
+	MOV A,B      ; Restore input to accumulator
+	ANI 04H      ; Mask to extract input bit A1
+	MOV C,A      ; Save A1 to register C
+	MOV A,B      ; Restore input to accumulator
+	ANI 08H      ; Mask to extract input bit B1
+	RRC          ; Rotate accumulator right to get LSB
+	XRA C        ; XOR A1 with LSB
+	RRC          ; Rotate accumulator right to get 2nd LSB
+	MOV E,A      ; Save the result
+	RRC          ; Rotate accumulator right to get LSB
+	XRA D        ; XOR with D (output of XOR0)
+	ORA E        ; OR with E (output of XOR1)
+	MOV D,A      ; Save the result at LSB
+
+	; AND gate
+	MOV A,B      ; Restore input to accumulator
+	ANI 10H      ; Mask to extract input bit A2
+	MOV C,A      ; Save A2 to register C
+	MOV A,B      ; Restore input to accumulator
+	ANI 20H      ; Mask to extract input bit B2
+	RRC          ; Rotate accumulator right to get LSB
+	ANA C        ; AND A2 with B2
+	MOV E,A      ; Save the result
+
+	; OR gate
+	MOV A,B      ; Restore input to accumulator
+	ANI 40H      ; Mask to extract input bit A3
+	MOV C,A      ; Save A3 to register C
+	MOV A,B      ; Restore input to accumulator
+	ANI 80H      ; Mask to extract input bit B3
+	RRC          ; Rotate accumulator right to get LSB
+	ANA C        ; AND A3 with B3
+	RRC          ; Rotate accumulator right to get 2nd LSB
+	RRC          ; Rotate accumulator right to get 3rd LSB
+	MOV B,A      ; Save the result at LSB
+	RRC          ; Rotate accumulator right to get 4th LSB
+	ORA D        ; OR with D (output of XOR gates)
+	MOV D,A      ; Save the result at 4th LSB
+
+	CMA          ; Invert the logic
+	STA 3000H    ; Output to the LEDs
+	JMP START    ; Repeat the process
+
+	END

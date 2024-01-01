@@ -1,0 +1,56 @@
+; ================== Exercise (3) ==================
+; ================== Question (a) ==================
+
+SWAP Nible MACRO Q
+	PUSH PSW	; Push the Program Status Word (PSW) onto the stack
+	MOV A,M	; Move the value in memory location M to the accumulator
+	RRC		; Rotate accumulator right through carry
+	RRC		; Repeat the rotation
+	RRC
+	RRC		; Rotate the accumulator four times (one for each nibble)
+	MOV M,A	; Move the modified accumulator value back to memory location M
+	MOV A,Q	; Move the value in Q to the accumulator
+	RLC		; Rotate accumulator left through carry
+	RLC		; Repeat the rotation
+	RLC
+	RLC		; Rotate the accumulator four times (one for each nibble)
+	MOV Q,A	; Move the modified accumulator value back to Q
+	POP PSW	; Pop the PSW from the stack, restoring its original value
+ENDM
+
+; ================== Question (b) ==================
+
+FILL MACRO RP, X, K
+	PUSH PSW	; Push the Program Status Word (PSW) onto the stack
+	PUSH H		; Push the register pair H onto the stack
+	MOV H,R	; Move the value in R to register H
+	MOV L,P	; Move the value in P to register L
+LOOP:
+	MOV M,K	; Move the value in K to the memory location specified by HL
+	INX H		; Increment the value in register pair HL
+	DCR X		; Decrement the value in X
+	JNZ LOOP	; Jump to the LOOP label if X is not zero
+	POP H		; Pop the register pair H from the stack, restoring its original
+			; value
+	POP PSW	; Pop the PSW from the stack, restoring its original value
+ENDM
+
+; ================== Question (c) ==================
+
+RHLR MACRO n
+	PUSH PSW	; Push the Program Status Word (PSW) onto the stack
+LOOP:
+	MOV A,n	; Move the value in n to the accumulator
+	CPI 00H	; Compare the accumulator with 0
+	JZ END		; If the result is zero, jump to the END label
+	MOV A,H	; Move the value in register H to the accumulator
+	RAR		; Rotate accumulator right through carry
+	MOV A,L	; Move the value in register L to the accumulator
+	RAR		; Rotate accumulator right through carry
+	DCR n		; Decrement the value in n
+	JMP LOOP	; Jump to the LOOP label
+END:
+	POP H		; Pop the register pair H from the stack, restoring its original
+			; value
+	POP PSW	; Pop the PSW from the stack, restoring its original value
+ENDM

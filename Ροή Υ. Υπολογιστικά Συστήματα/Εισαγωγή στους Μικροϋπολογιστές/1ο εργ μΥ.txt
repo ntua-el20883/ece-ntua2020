@@ -1,0 +1,160 @@
+.include "m328PBdef.inc" 
+;complements
+.DEF AC = r11
+.DEF BC = r12
+.DEF CC = r13
+.DEF DC = r14
+.DEF temp = r24
+.DEF A = r16
+.DEF B = r17 
+.DEF C = r18 
+.DEF D = r19 
+.DEF F0= r20 
+.DEF F1= r21
+
+reset: 
+    ldi temp,low(RAMEND) ;???????????? Stack Pointer 
+    out SPL,temp 
+    ldi temp,high(RAMEND) 
+    out SPH,temp
+start: 
+    ser temp 
+    out DDRC,temp	;???? B ?? ??????? 
+    clr temp
+    out DDRB,temp	;???? C ?? ?????? 
+main:
+    in temp,PINB	;???????? ?????????? PORTB 
+    mov A,temp		;?? ? ??? LSB ??? ?????????? ? 
+    ; andi A,0x01
+    
+    lsr temp 
+    mov B,temp		;?? ? ??? LSB ??? ?????????? ? 
+    ;andi B,0x01
+    
+    lsr temp 
+    mov C,temp		;?? C ??? LSB ??? ?????????? C 
+    ;andi C,0x01
+    
+    lsr temp 
+    mov D,temp		;?? D ??? LSB ??? ?????????? D 
+    ;andi D,0x01
+    
+    mov AC,A
+    mov BC,B
+    mov CC,C
+    mov DC,D
+
+    com AC
+    com BC
+    com CC
+    com DC
+    
+    ;mov F0,A
+    ;mov F1,B
+    ;F0   
+    and BC,D	    ;LSB(BC) = B'D
+    mov F0,A
+    and F0,B	    ;LSB(F0) = AB
+    or F0,BC	    ;LSB(F0) = AB + B'D
+    andi F0,0x01
+   
+    ;F1
+    mov F1,B	    ;F1 = B
+    or F1,DC	    ;F1 = B+D'
+    or AC,CC	    ;AC = A'+C'
+    and F1,AC	    ;F1 = (A'+C')*(B+D')
+    andi F1,0x01
+   
+    lsl F1
+    or F0,F1 
+    out PORTC,F0
+    rjmp main
+
+
+
+
+
+
+
+
+
+.include "m328PBdef.inc"    ;ATmega328P microcontroller definitions
+    
+; delay = (1000*F1+14) cycles (abougt DEL_mS in mSeconds)
+.equ FOSC_MHZ=16	;MHz
+.equ DEL_mS=10	;mS
+.equ F1=FOSC_MHZ*DEL_mS
+    
+;Init Stack Pointer
+    ldi r24, LOW(RAMEND)
+    out SPL, r24 
+    ldi r24, HIGH(RAMEND)
+    out SPH, r24
+
+;Init PORT? as output
+    ser r26         
+    out DDRD, r26 
+
+    ldi r24, low(F1)	    ;   
+    ldi r25, high(F1)	    ;Set delay
+    
+initialize:
+    ldi r16, 0x80 ;Set r16=0x80:top left led open
+    ldi r17, 0x07 ;Set r17=0x07 as a counter to see if all checked
+    com r16
+    OUT DDRD, r16 ;Output on LEDs
+    com r16
+    call delay_outer ;Add delay
+loop:
+    com r16
+    OUT DDRD, r16 ;Output on LEDs
+    com r16
+    call delay_outer ;Call Delay
+    lsr r16 ;Shift right logical to open next LED
+    dec r17 ;Decrease counter by 1
+    ;cpi r17, 0 ;Compare counter with 0
+    brne loop ;If counter>0 return to loop
+    com r16
+    OUT DDRD, r16 ;Output of next position in LEDs
+    com r16
+    call delay_outer ;Add delay
+    ldi r17, 0x07
+loop2:
+    com r16
+    OUT DDRD, r16 ;Output on LEDs
+    com r16
+    call delay_outer ;Call Delay
+    lsl r16 ;Shift right logical to open next LED
+    dec r17 ;Decrease counter by 1
+    ;cpi r17, 0 ;Compare counter with 0
+    brne loop2 ;If counter>0 return to loop
+    rjmp initialize
+;loop2:
+   ; OUT DDRD, r16 ;Output on LEDs
+   ; call delay_outer ;Call Delay
+    
+    
+;this routine is used to produce a delay 993 cycles
+delay_inner:		    
+    ldi	r23, 69	    ; (1 cycle)	
+loop3:
+    dec r23		    	; 1 cycle
+    nop			    ; 1 cycle
+    brne loop3		    ; 1 or 2 cycles
+    nop			    ; 1 cycle
+    ret			    ; 4 cycles
+    
+    
+;this routine is used to produce a delay of (1000*F1+14) cycles
+delay_outer:
+    push r24		    ; (2 cycles)	    
+    push r25		    ; (2 cycles) Save r24:r25  
+    
+loop4:
+    rcall delay_inner	    ; (3+993)=996 cycles
+    sbiw r24 ,1		    ; 2 cycles
+    brne loop4		    ; 1 or 2 cycles
+    
+    pop r25		    ; (2 cycles)
+    pop	r24		    ; (2 cycles) Restore r24:r25
+    ret			    ;4 cycles

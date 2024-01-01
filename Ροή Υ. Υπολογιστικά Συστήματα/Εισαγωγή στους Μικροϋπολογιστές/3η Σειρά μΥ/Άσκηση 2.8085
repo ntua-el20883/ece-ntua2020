@@ -1,0 +1,54 @@
+      IN 10H
+      MVI D,16H ;D gets value 16H(K1=16H=22)
+      MVI E,4EH ;E gets value 4EH(K2=4EH=78)
+      MVI A,10H ;Set 7-segment display digits to empty(10H)
+      STA 0B00H
+      STA 0B01H
+      STA 0B02H
+      STA 0B03H
+      STA 0B04H
+      STA 0B05H
+      MVI A,0DH ;Interrupt mask
+      SIM
+      EI ;Enable RST 6.5 interruptions
+
+WAIT: 
+     JMP WAIT ;Wait for interruption
+
+INTR_ROUTINE:
+     CALL KIND ;Get first input from keyboard
+     STA 0B04H ;Store units(First input has lower importance) at 5th segment display
+     MOV B,A ;Save A at B
+     CALL KIND ;Get second input from keyboard
+     STA 0B05H ;Store tens at 6th segment display
+     RLC ;Rotate left 4 times to multiply tens by 16
+     RLC
+     RLC
+     RLC 
+     ADD B ;Get number
+     MOV B,A ;Save A at B
+     PUSH D ;Save D and E
+     LXI D,0B00H ;For STDM
+     CALL STDM
+     CALL DCD
+     POP D ;Restore D and E
+     MOV A,B ;A gets again input number value to do necessary comparisons
+     CMP D ;Compare A with K1
+     JC FIRST_STATE ;If 0<=A<=K1 open LED 1
+     JZ FIRST_STATE 
+     CMP E ;Compare A with K2
+     JC SECOND_STATE ;If K1<A<=K2 open LED 2
+     JZ SECOND_STATE 
+     MVI A,FBH ;Turn only LED 3 on
+     JMP OUTPUT ;Jump to OUTPUT
+FIRST_STATE: 
+     MVI A,FEH ;Turn only LED 1 on
+     JMP OUTPUT ;Jump to OUTPUT
+SECOND_STATE:
+     MVI A,FDH ;Turn only LED 2 on
+OUTPUT:
+     STA 3000H ;Output on LEDs
+     EI
+     JMP WAIT ;Check for next interruption
+
+END

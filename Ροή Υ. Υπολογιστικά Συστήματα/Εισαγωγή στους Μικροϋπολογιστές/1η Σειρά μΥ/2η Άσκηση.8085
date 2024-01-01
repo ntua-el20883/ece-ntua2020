@@ -1,0 +1,29 @@
+	IN 10H	
+	LXI B,01F4H	; Load immediate the values B=01H, C=F4H (01F4Hex = 500Dec)
+	MVI E,01H	; Move immediate the value E=01H (i.e., number of LED to be lit)
+PROG:	
+	LDA 2000H	; Load the value of mem_loc 2000H (i.e., input) to A
+	MOV D,A	
+	RAR		; Rotate right A’s contents, so that CY=LSB
+	JC PROG	; If(CY==1) then (jump PROG)
+	MOV A,D	
+	CALL DELB	; Wait for 0.5secs
+	RAL		; Rotate left A’s contents, so that CY=MSB
+	JNC RIGHT	; If(CY==0) then (we’d turn RIGHT) else (we’d turn LEFT)
+LEFT:	
+	MOV A,E	; Move E’s contents (i.e., number of LED to be lit to A
+	CMA		; Complement A’s contents (reverse logic LEDs)
+	STA 3000H	; Store A’s contents to mem_loc 3000H (i.e., output)
+	CMA		; Complement A’s contents (original A’s contents)
+	RLC		; Rotate left A’s contents, to find next LED to be lit
+	MOV E,A	
+	JMP PROG	
+RIGHT:	
+	MOV A,E	; Move E’s contents (i.e., number of LED to be lit) to A
+	CMA		; Complement A’s contents (reverse logic LEDs	)
+	STA 3000H	; Store A’s contents to mem_loc 3000H (i.e., output)
+	CMA		; Complement A’s contents (original A’s contents)
+	RRC		; Rotate right A’s contents, to find next LED to be lit
+	MOV E,A	
+	JMP PROG	
+END

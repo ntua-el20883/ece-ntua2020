@@ -1,0 +1,54 @@
+; ===== Exercise 1 =====
+; ==== Question (a) ====
+	IN 10H
+	MVI A,00H   ; Move immediate to A the value 0
+	LXI H,0900H	; Load immediate to HL the mem_loc 0900H
+	MOV M,A	; Store A's contents to mem_loc pointed by HL
+LOOP_A:
+	INR A       	; Increment A's contents by 1
+	INX H       	; Increment HL's contents by 1 
+	MOV M,A     	; Store A's contents to mem_loc pointed by HL
+	CPI 7FH     	; If(A==127) then (Z=0) --- (127 Dec == 7F Hex)
+	JNZ LOOP_A	; If(Z!=0) then (jump to Loop_A)
+
+
+; ==== Question (b) ====
+	LXI B,0000H 	; Store immediate to BC the value 0 (BC will hold the #1's)
+LOOP_B:
+	MOV A,M     	; Load to A the contents of mem_loc pointed by HL (now 09FFH, 
+			; due to Question (a))
+	MVI D,09H   	; Move immediate to D the value 9 (so to check each digit)
+MAIN:		
+	DCR D       	; Decrease D's contents by 1
+	JZ NEXT     	; If (D==0) then (jump to Next)
+	RRC         	; Rotate A's contents right, so that CF=LSB
+	JNC MAIN 	; If (CF!=0 so LSB!=0) then (we found 1) else (jump to Main)
+GOT_ONE:
+	INX B		; Increase BC's contents by 1 (we found 1)
+	JMP MAIN		
+NEXT:
+	DCR L       	; Decrease L's contents by 1, so to point to the next byte of memory
+	JNZ LOOP_B  ; If (L!=0, so we've checked all bytes) then (jump to Loop_B) 
+			; else (end)
+
+
+; ==== Question (c) ====	
+	MVI E,7FH	; Move immediate to E the value 7F Hex == 127 Dec
+	MVI D,00H   	; Move immediate to E the value 0
+	MOV A,M     	; Load to A the contents of mem_loc pointed by HL (now 09FFH, 
+			; due to Question (a))
+LOOP_C:
+	CPI 10H    	; If (A<10) then (don't count)
+	JC DONT
+	CPI 61H     	; If (A>91) then (don't count)
+	JNC DONT
+	INR D       	; Increase D's contents by 1 (the number is between 10 and 91,
+			; so count)
+DONT:	
+	INR L       	; Increase L's contents by 1, so that HL points to the next mem_loc
+	MOV A,M	; Load to A the contents of mem_loc pointed by HL 
+	DCR E		; Decrease E's contents by 1
+	JZ END 	; If (E==0) then (there's left only the 0, so end)
+	JMP LOOP_C      		
+END:
+	END

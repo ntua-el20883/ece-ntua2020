@@ -1,0 +1,57 @@
+; ===== Exercise 2 =====
+	LXI B,0064H	; Load immediate to BC the value 64 Hex == 100 Dec
+			; The subsequence DELB delays the operation for (BC)*1 msec, 
+			; so 0.1secs)
+MAIN:
+	LDA 2000H	; Load to A the contents of mem_loc 2000H (i.e. input)
+	RLC		; Rotate left A's contents, so that CF=MSB
+	JNC OFF	; If (CF!=0, so MSB!=0) then (MSB is OFF)
+	JMP MAIN
+OFF:				
+	LDA 2000H	; Load to A the contents of mem_loc 2000H (i.e. input)
+	RLC		; Rotate left A's contents, so that CF=MSB
+	JC ON_		; If (CF==1)	then (MSB is ON) else (wait until MSB is ON)
+	JMP OFF		
+ON_:
+	MVI D,C8H	; Set register D to C8H
+	LDA 2000H	; Load the value at memory location 2000H into accumulator A and 
+			; rotate it left through carry bit
+	RLC		; If the carry bit is 0, jump to DONE
+	JNC DONE
+	JMP ON
+DONE:
+	LDA 2000H	; Load the value at mem_loc 2000H into accumulator A and 
+			; rotate it left through carry bit
+	RLC		; If the carry bit is 1, jump to ON_AGAIN
+	JC ON_AGAIN	
+	MVI A,00H	; Set accumulator A to 00H, store it to mem_loc 3000H (i.e. output),
+			; call DELB, decrement register D, and jump to OPEN if D is
+			; not 0, otherwise set A to FFH, store it to mem_loc 3000H, and
+			; jump to OFF
+	STA 3000H
+	CALL DELB
+	DCR D	
+	JNZ DONE	
+	MVI A,FFH
+	STA 3000H	
+	JMP OFF
+ON_AGAIN:		
+	LDA 2000H	; Load the value at mem_loc 2000H into accumulator A and rotate it
+			; left through carry bit
+	RLC		; If the carry bit is 0, jump to RESTART		
+	JNC RESTART
+	MVI A,00H	; Set accumulator A to 00H, store it to memory location 3000H, call
+			; subroutine DELB, decrement register D, and jump to ON_AGAIN if D
+			; is not 0, otherwise set A to FFH, store it to mem_loc 3000H, and
+			; jump to OFF
+	STA 3000H
+	CALL DELB
+	DCR D
+	JNZ ON_AGAIN
+	MVI A,FFH
+	STA 3000H
+	JMP OFF
+RESTART:
+	MVI D,C8H	; Set register D to C8H and jump to DONE
+	JMP DONE
+END

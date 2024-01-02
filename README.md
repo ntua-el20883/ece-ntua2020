@@ -1,7 +1,7 @@
 # Welcome to my repo, ece-ntua2020
 ```
 #include <pzhelp>     // tribute to the man, the myth, the legend; pap42
-int main(){
+PROGRAM(){
   WRITELN(
     Εδώ αποθηκεύω όσες σημειώσεις μάζεψα από τη φοίτηση μου στην ΣΗΜΜΥ-ΕΜΠ από το 2020.
 

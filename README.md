@@ -24,8 +24,8 @@ PROGRAM(){
 OneDrive για το 1ο και το 2ο Εξάμηνο, από τον Θανάση Σπηλιώτη: <br /> 
 - 1ο Εξάμηνο: https://ntuagr-my.sharepoint.com/:f:/g/personal/el20175_ntua_gr/Et3zHsZ1T3pCidiVwoLAhW4ByfkD19Gs_FUDbFFfN8hOaw <br /> 
 - 2ο Εξάμηνο: https://ntuagr-my.sharepoint.com/:f:/g/personal/el20175_ntua_gr/EtiYkRX-QHJBsnmTbYiltLgBKZptOyrrfJH4sb61D9okOg?e=wbkndU <br /> 
-- Google Drive για το 4ο Εξάμηνο, από τον Χριστόδουλο Στυλιανίδη:  <br /> 
-https://drive.google.com/drive/folders/1B8XAj7VmcjjgR5Beemmy6ZiJp3x-Nz66
+Google Drive για το 4ο Εξάμηνο, από τον Χριστόδουλο Στυλιανίδη:  <br /> 
+- https://drive.google.com/drive/folders/1B8XAj7VmcjjgR5Beemmy6ZiJp3x-Nz66
 
 # Φόρουμ
 Το φόρουμ της Σχολής, όπου θα βρείτε πολύ παραπάνω υλικό (σημειώσεις, παλαιά θέματα κτλπ): <br /> 

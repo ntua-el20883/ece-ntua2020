@@ -1,0 +1,28 @@
+    #include <iostream>  
+    #include <vector>  
+    #include <algorithm>  
+      
+    using namespace std;  
+      
+    int main() {  
+        int N, K;  
+        cin >> N >> K;  
+        vector<int> prices(N);  
+        for (int i = 0; i < N; ++i) {  
+            cin >> prices[i];  
+        }  
+      
+        vector<vector<int>> dp(N+1, vector<int>(K+1, 0));  
+          
+        for (int k = 1; k <= K; ++k) {  
+            int maxDiff = -prices[0];  
+            for (int i = 1; i < N; ++i) {  
+                dp[i][k] = max(dp[i-1][k], prices[i] + maxDiff);  
+                maxDiff = max(maxDiff, dp[i][k-1] - prices[i]);  
+            }  
+        }  
+      
+        cout << dp[N-1][K] << endl;  
+      
+        return 0;  
+    }  

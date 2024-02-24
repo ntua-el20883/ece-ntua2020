@@ -1,0 +1,78 @@
+#include <iostream>    
+#include <vector>    
+#include <algorithm>    
+  
+using namespace std;    
+  
+// Function to check if there is a subarray with a sum greater than zero  
+// within a given range of elements in the array.  
+bool check(vector<int>& arr, int startK, int mid, int N) {    
+    // Initialize a prefix sum array to keep track of the cumulative sum  
+    // of elements greater than or equal to 'mid'.  
+    vector<int> prefix(N + 1, 0);    
+    for (int i = 1; i <= N; ++i) {    
+        prefix[i] = prefix[i - 1] + (arr[i - 1] >= mid ? 1 : -1);    
+    }    
+  
+    // Initialize a variable to store the minimum prefix sum encountered  
+    // within the specified subarray.  
+    int minPrefix = 0;    
+    // Iterate through the subarray within the specified range.  
+    for (int i = startK; i <= N; ++i) {    
+        // Update the minimum prefix sum encountered so far.  
+        minPrefix = min(minPrefix, prefix[i - startK]);    
+        // If the difference between the current prefix sum and the minimum  
+        // prefix sum is greater than zero, there is a subarray with a sum  
+        // greater than zero, so return true.  
+        if (prefix[i] - minPrefix > 0) {    
+            return true;    
+        }    
+    }    
+  
+    // If no subarray with a sum greater than zero is found, return false.  
+    return false;    
+}    
+  
+// Function to find the greatest possible median within a given array.  
+int findGreatestMedian(vector<int>& arr, int startK, int N) {    
+    // Initialize low and high for binary search on the possible medians.  
+    int low = 1, high = *max_element(arr.begin(), arr.end()), result = -1;    
+  
+    // Perform binary search to find the greatest median.  
+    while (low <= high) {    
+        int mid = low + (high - low) / 2;    
+        // Check if there is a subarray with a sum greater than zero  
+        // using the current median 'mid'.  
+        if (check(arr, startK, mid, N)) {    
+            // If true, update the result and move to the right half of the search space.  
+            result = mid;    
+            low = mid + 1;    
+        } else {    
+            // If false, move to the left half of the search space.  
+            high = mid - 1;    
+        }    
+    }    
+  
+    // Return the greatest median found.  
+    return result;    
+}    
+  
+// Main function  
+int main() {    
+    // Input the size of the array (N) and the subarray size (startK).  
+    int N, startK;    
+    cin >> N >> startK;    
+  
+    // Input the array elements.  
+    vector<int> arr(N);    
+    for (int i = 0; i < N; ++i) {    
+        cin >> arr[i];    
+    }    
+  
+    // Find and output the greatest possible median.  
+    int result = findGreatestMedian(arr, startK, N);    
+    cout << result << endl;    
+  
+    // Return 0 to indicate successful execution.  
+    return 0;    
+} 

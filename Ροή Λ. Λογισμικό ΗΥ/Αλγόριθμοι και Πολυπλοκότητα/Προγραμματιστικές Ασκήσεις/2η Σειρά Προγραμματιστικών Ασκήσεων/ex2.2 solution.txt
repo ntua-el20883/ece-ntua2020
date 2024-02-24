@@ -1,0 +1,197 @@
+// ======== DISCLAIMER ========
+// This exercise has 22 tests cases
+// 16 of them are for N = 8000 (80% of the exercise) and are answered by calculateDPtableSMALL
+// 6 of them are for N = 10^5 (110% of the exercise) and are SUPPOSED TO be answered by calculateDPtableBIG, but the implementation is WRONG
+#include <iostream>
+#include <vector>
+#include <climits>
+#include <cfloat>
+#include <stdio.h>
+using namespace std;
+
+#define BSIZE 1<<15
+char buffer[BSIZE];
+long bpos = 0L, bsize = 0L;
+
+// Function to read quickly large inputs
+long readLong()
+{
+    long d = 0L, x = 0L;
+    char c;
+
+    while (1)  {
+        if (bpos >= bsize) {
+            bpos = 0;
+            if (feof(stdin)) return x;
+            bsize = fread(buffer, 1, BSIZE, stdin);
+        }
+        c = buffer[bpos++];
+        if (c >= '0' && c <= '9') { x = x*10 + (c-'0'); d = 1; }
+        else if (d == 1) return x;
+    }
+    return -1;
+}
+
+// ==================================================
+// ============= Initialize Graph stuff =============
+// ==================================================
+struct edge_distance {
+    long long destination_vertex, distance;
+};
+
+struct vertex_ps {
+    long long p, s;
+};
+
+vector<vector<edge_distance>> City;
+vector<vertex_ps> Velocities;
+vector<long long> Dp;
+vector<long long> DistanceToRoot;
+vector<long long> Ancestors;
+
+void calculateDistanceToRoot(long long current_vertex, long long parent, long long distance) {
+    DistanceToRoot[current_vertex] = distance;
+
+    for (const edge_distance& edge : City[current_vertex]) {
+        if (edge.destination_vertex != parent) {
+            calculateDistanceToRoot(edge.destination_vertex, current_vertex, distance + edge.distance);
+        }
+    }
+}
+
+// ==================================================
+// ======= Initialize Convex Hull Trick stuff =======
+// ==================================================
+struct line {
+    long long m, b;
+};
+
+double intersect (line a, line b) {
+    return ( double )(b.b - a.b + a.m - b.m - 1) / (a.m - b.m);
+}
+
+vector<line> Cht;
+
+void add(line l) {
+    long long n = Cht.size();
+    while (n >= 2 && intersect(Cht[n-1], Cht[n-2]) >= intersect(Cht[n-1], l)) {
+        Cht.pop_back();
+        n = Cht.size();
+    }
+    Cht.push_back(l);
+}
+
+long long query(long long x) {
+    long long low = 0, high = Cht.size()-2, idx = Cht.size()-1;
+
+    while(low <= high){
+        long long const mid = (low+high)/2;
+        if(intersect(Cht[mid],Cht[mid+1]) >= x) { idx = mid;  high = mid-1; }
+        else { low = mid + 1; }
+    }
+    return Cht[idx].m*x + Cht[idx].b;
+}
+
+// dp[i] = p_i + s_i + DistanceToRoot[i] + min_j { - s_i * DistanceToRoot[j] + dp[j] }
+// If:
+//      directTimeToRoot[i] = p_i + s_i + DistanceToRoot[i]
+//      m[j] = - DistanceToRoot[j]
+//      b[j] = dp[j]
+// Then:
+//      dp[i] = directTimeToRoot[i] + min_j { s_i * m[j] + b[j] }
+//      and m[j] is decreasing
+//      query(s_i)
+//      cht(m[j], b[j])
+void calculateDPtableBIG(long long current_vertex, long long ancestorNode) {
+    if (current_vertex == 1) {
+        Dp[current_vertex] = 0;
+    } else {
+        long long directTimeToRoot = Velocities[current_vertex].p + Velocities[current_vertex].s * DistanceToRoot[current_vertex];
+        Dp[current_vertex] = directTimeToRoot + query(Velocities[current_vertex].s);
+
+        line l = {-DistanceToRoot[ancestorNode], Dp[ancestorNode]};
+        add(l);
+    }
+
+    for (const edge_distance& child : City[current_vertex]) {
+        if (child.destination_vertex != ancestorNode) {
+            calculateDPtableBIG(child.destination_vertex, current_vertex);
+        }
+    }
+
+    // Remove the current current_vertex from the hull to backtrack
+    if (!Cht.empty()) Cht.pop_back();
+}
+
+void calculateDPtableSMALL(long long node, long long ancestorNode, long long distance) {
+    DistanceToRoot[node] = distance;
+    Ancestors[node] = ancestorNode;
+
+    // Calculate the cost of going directly to the root --V1
+    long long const costToRoot = Velocities[node].p + Velocities[node].s * static_cast<long long>(DistanceToRoot[node]);
+    Dp[node] = costToRoot;
+
+    // Calculate the cost of going to an ancestor and change
+    for (long long anc = ancestorNode; anc != -1; anc = Ancestors[anc]) {
+        long long costToAnc = Velocities[node].p + Velocities[node].s * static_cast<long long>(DistanceToRoot[node] - DistanceToRoot[anc]) + Dp[anc];
+        Dp[node] = min(Dp[node], costToAnc);
+    }
+
+    // Recursively, calculate for its children
+    for (const edge_distance& child : City[node]) {
+        if (child.destination_vertex != ancestorNode) {
+            calculateDPtableSMALL(child.destination_vertex, node, distance + child.distance);
+        }
+    }
+}
+
+// ==================================================
+// ====================== Main ======================
+// ==================================================
+int main() {
+    long long N;
+    N = readLong();
+
+    // Resize data structures to accommodate the nodes
+    City.resize(N + 1);
+    Velocities.resize(N + 1);
+    Dp.resize(N + 1, LLONG_MAX);
+    DistanceToRoot.resize(N + 1, 0);
+    Ancestors.resize(N + 1, -1);
+
+    // Reading connections and distances between nodes
+    for (long long i = 0; i < N - 1; ++i) {
+        long long Vi, Vj, Dij;
+        Vi = readLong();
+        Vj = readLong();
+        Dij = readLong();
+        City[Vi].push_back({Vj, Dij});
+        City[Vj].push_back({Vi, Dij});
+    }
+
+    // Reading vertex and s expenses for each node
+    for (long long i = 2; i <= N; ++i) {
+        Velocities[i].p = readLong();
+        Velocities[i].s = readLong();
+    }
+
+    Dp[1] = 0;
+    // Solve the problem from the root node (v1)
+    if(N > 8001) {
+        calculateDistanceToRoot(1, -1, 0);
+        cout << "Yes" << endl;
+        calculateDPtableBIG(1, -1);
+    }
+    else {
+        calculateDPtableSMALL(1, -1, 0);
+    }
+
+    // Printing the Dp table
+    cout << Dp[2];
+    for (long long i = 3; i <= N; ++i) {
+        cout << " " << Dp[i];
+    }
+    cout << endl;
+
+    return 0;
+}

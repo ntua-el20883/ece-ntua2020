@@ -1,0 +1,27 @@
+var production{1 .. 12} >= 0 integer;
+var stock{1 .. 12} >= 0 integer;
+var increase{1 .. 12} >= 0 integer;
+var decrease{1 .. 12} >= 0 integer;
+var overtime{1 .. 12} >= 0 integer;
+var underemployment{1 .. 12} >= 0 integer;
+
+minimize z: sum{j in 1..12} (50*production[j] + 0.8*stock[j] + 1.3*increase[j] + 2*decrease[j] + 2.5*overtime[j] + 4*underemployment[j]);
+
+subject to constraint_1:  production[1] + 700 = stock[1] + 2100;
+subject to constraint_2:  production[2] + stock[1] = stock[2] + 1900;
+subject to constraint_3:  production[3] + stock[2] = stock[3] + 1600;
+subject to constraint_4:  production[4] + stock[3] = stock[4] + 1500;
+
+subject to constraint_5:  production[5] + stock[4] = stock[5] + 1550;
+subject to constraint_6:  production[6] + stock[5] = stock[6] + 1400;
+subject to constraint_7:  production[7] + stock[6] = stock[7] + 1250;
+subject to constraint_8:  production[8] + stock[7] = stock[8] + 1700;
+
+subject to constraint_9:  production[9] + stock[8] = stock[9] + 2200;
+subject to constraint_10:  production[10] + stock[9] = stock[10] + 2300;
+subject to constraint_11:  production[11] + stock[10] = stock[11] + 2100;
+subject to constraint_12:  production[12] + stock[11] = stock[12] + 1950;
+
+subject to constraint_Inc_Dec_1st: production[1] - 1600 = increase[1] - decrease[1];
+subject to constraint_Inc_Dec{j in 2..12}: production[j] - production[j-1] = increase[j] + decrease[j];
+subject to constraint_Ov_Und{j in 1..12}: production[j] - 1800 = overtime[j] - underemployment[j];

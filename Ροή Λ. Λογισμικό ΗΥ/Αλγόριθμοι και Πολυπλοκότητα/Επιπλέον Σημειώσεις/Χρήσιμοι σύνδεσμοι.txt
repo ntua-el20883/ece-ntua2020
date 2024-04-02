@@ -1,0 +1,19 @@
+Χρήσιμοι σύνδεσμοι*
+*******************
+Π. Ροντογιάννης θεωρία υπολογισμού- Μη-επιλυσιμότητα (διαλέξεις 22-24)
+Βίντεο για τις αναγωγές από το προπτυχιακό μάθημα της θεωρίας υπολογισμού του κου Ροντογιάννη στο DIT  (καταγραφή φοιτητών χωρίς την άδεια του καθηγητή) https://www.youtube.com/playlist?list=PLgClVqtlShcl1D36eSPhmwAWnNLa1abDo 
+
+-------------------
+Βιντεοδιαλέξεις Φωτάκη: https://courses.corelab.ntua.gr/course/view.php?id=60 (κωδικος διαλέξεων AlgoFun2021!)
+Στην εξέταση δεν επιτρέπονται ανοιχτές σημειώσεις.
+Για προσεγγιστικούς - πιθανοτικούς μπορείς να δεις τις πρώτες διαλέξεις από την κάθε ενότητα από τις καταγεγραμμένες που υπάρχουν στα προηγμένα θέματα αλγορίθμων με κωδικό Adv-Algo!2021+ . (https://courses.corelab.ntua.gr/course/view.php?id=44)
+-----------------
+
+Correctness proof 
+
+----------
+"cut and paste" technique (dynamic programming, greedy) (CLRS παραγρ 15.3 Στοιχεία δυναμικού προγραμματισμού) Χρήση για νδο το πρόβλημα έχει βέλτιστη υποδομή
+https://stackoverflow.com/questions/9553162/what-is-the-cut-and-paste-proof-technique
+------------
+How do I know if my algorithm is right (without coding)?
+https://cs.stackexchange.com/questions/32011/how-do-i-know-if-my-algorithm-is-right-without-coding

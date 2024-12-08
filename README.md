@@ -32,13 +32,9 @@ Google Drive, από τον Χριστόδουλο Στυλιανίδη:  <br />
 Το φόρουμ της Σχολής, όπου θα βρείτε πολύ παραπάνω υλικό (σημειώσεις, παλαιά θέματα κτλπ): <br /> 
 https://shmmy.ntua.gr/forum/
 
-# GradeHub
-Site για να καταχωρίσετε τους βαθμούς σας, να ελέγχετε ποια μαθήματα θα δώσουν οι φίλοι σας κ.α., από τον  Χριστόδουλο Στυλιανίδη:  <br />
-http://uniportal.sytes.net:8800/
-
 # Contacts
 Γενικά, δεν χρησιμοποιώ το Discord μου πλέον. Για οποιαδήποτε απορία, επικοινωνήστε μαζί μου μέσω των socials:
-- Instagram (recommended): [@jua.tsa](https://l.messenger.com/l.php?u=https%3A%2F%2Fwww.instagram.com%2Fjuan.tsa%2Fprofilecard%2F%3Figsh%3DNG1pMW00aWx3MW16&h=AT37Gzyfe6W8jDHP2WvN3gq9-0Rn0MNA44CZ_9DO05drP8EmJcY1nq6ktBqYwyZyuybnjquOWlsic62bcm5D-i72rIpdAgoJgBcTv-2RFwSjIcPhYRqZpurTQxZYNbgb-mFs)
+- Instagram (recommended): [@juan.tsa](https://l.messenger.com/l.php?u=https%3A%2F%2Fwww.instagram.com%2Fjuan.tsa%2Fprofilecard%2F%3Figsh%3DNG1pMW00aWx3MW16&h=AT37Gzyfe6W8jDHP2WvN3gq9-0Rn0MNA44CZ_9DO05drP8EmJcY1nq6ktBqYwyZyuybnjquOWlsic62bcm5D-i72rIpdAgoJgBcTv-2RFwSjIcPhYRqZpurTQxZYNbgb-mFs)
 - Facebook Messenger: Juanillo Ts
 
 # Star

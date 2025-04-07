@@ -33,9 +33,7 @@ Google Drive, από τον Χριστόδουλο Στυλιανίδη:  <br />
 https://shmmy.ntua.gr/forum/
 
 # Contacts
-Γενικά, δεν χρησιμοποιώ το Discord μου πλέον. Για οποιαδήποτε απορία, επικοινωνήστε μαζί μου μέσω των socials:
-- Instagram (recommended): [@juan.tsa](https://l.messenger.com/l.php?u=https%3A%2F%2Fwww.instagram.com%2Fjuan.tsa%2Fprofilecard%2F%3Figsh%3DNG1pMW00aWx3MW16&h=AT37Gzyfe6W8jDHP2WvN3gq9-0Rn0MNA44CZ_9DO05drP8EmJcY1nq6ktBqYwyZyuybnjquOWlsic62bcm5D-i72rIpdAgoJgBcTv-2RFwSjIcPhYRqZpurTQxZYNbgb-mFs)
-- Facebook Messenger: Juanillo Ts
+Γενικά, δεν χρησιμοποιώ το Discord μου πλέον. Για οποιαδήποτε απορία, επικοινωνήστε μαζί μου μέσω email, [ioannistsantilas89@gmail.com](ioannistsantilas89@gmail.com).
 
 # Star
 Εάν σας βοήθησε το repo, please star it :3
